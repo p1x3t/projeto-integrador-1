@@ -1,0 +1,9 @@
+{
+  "nomeEmpresa": "Lanails Arte",
+  "chavePix": "seu-email@pix.com",
+  "servicos": [
+    { "id": 1, "nome": "Aplicação em Gel", "preco": 120 },
+    { "id": 2, "nome": "Manutenção", "preco": 80 },
+    { "id": 3, "nome": "Fibra de Vidro", "preco": 150 }
+  ]
+}

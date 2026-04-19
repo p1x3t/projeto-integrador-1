@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/p1x3t/projeto-integrador-1#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "express": "^5.2.1",
     "nodemailer": "^8.0.5"
   }

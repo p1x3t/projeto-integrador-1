@@ -2,72 +2,21 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zanza - Lanails Arte</title>
+    <title>Zanza</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #fdf2f8; color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1 { color: #db2777; text-align: center; }
-        p { text-align: center; color: #666; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #db2777; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        button:hover { background-color: #be185d; }
+        body { font-family: sans-serif; background: #fdf2f8; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .box { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
+        h1 { color: #db2777; }
+        .btn { display: block; width: 250px; padding: 15px; margin: 10px auto; border-radius: 10px; text-decoration: none; color: white; font-weight: bold; }
+        .cliente { background: #db2777; }
+        .admin { background: #444; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Lanails Arte</h1>
-        <p>Agende seu horário de forma simples e rápida!</p>
-        
-        <div class="form-group">
-            <label for="nome">Nome Completo</label>
-            <input type="text" id="nome" placeholder="Ex: Maria Silva">
-        </div>
-
-        <div class="form-group">
-            <label for="email">E-mail</label>
-            <input type="email" id="email" placeholder="Ex: maria@email.com">
-        </div>
-
-        <div class="form-group">
-            <label for="servico">Serviço Desejado</label>
-            <select id="servico">
-                <option value="Aplicação em Gel (2h30)">Aplicação em Gel (2h30)</option>
-                <option value="Manutenção (1h30)">Manutenção (1h30)</option>
-                <option value="Fibra de Vidro (3h00)">Fibra de Vidro (3h00)</option>
-            </select>
-        </div>
-
-        <button onclick="agendar()">Confirmar Agendamento</button>
+    <div class="box">
+        <h1>Zanza</h1>
+        <a href="/cliente" class="btn cliente">🙋‍♀️ Área da Cliente</a>
+        <a href="/admin" class="btn admin">⚙️ Painel Admin</a>
     </div>
-
-    <script>
-        async function agendar() {
-            const nome = document.getElementById('nome').value;
-            const email = document.getElementById('email').value;
-            const servico = document.getElementById('servico').value;
-
-            if(!nome || !email) {
-                alert('Por favor, preencha seu nome e e-mail.');
-                return;
-            }
-
-            // Esta parte envia os dados para o seu server.js
-            try {
-                const resposta = await fetch('/agendar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nome, email, servico })
-                });
-
-                const resultado = await resposta.json();
-                alert(resultado.mensagem);
-            } catch (erro) {
-                alert('Erro ao conectar com o servidor Zanza.');
-            }
-        }
-    </script>
 </body>
 </html>

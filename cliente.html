@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zanza - Agendamento</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #fdf2f8; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { color: #db2777; text-align: center; margin-bottom: 5px; }
+        p { text-align: center; color: #666; margin-bottom: 25px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #444; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        input:focus, select:focus { border-color: #db2777; outline: none; box-shadow: 0 0 5px rgba(219, 39, 119, 0.2); }
+        button { width: 100%; padding: 14px; background-color: #db2777; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        button:hover { background-color: #be185d; transform: scale(1.02); }
+        .link-toggle { text-align: center; margin-top: 15px; font-size: 13px; color: #db2777; cursor: pointer; text-decoration: underline; }
+        .btn-sair { background-color: #666; margin-top: 20px; padding: 8px; font-size: 12px; }
+        select:disabled { background-color: #eee; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="nome-empresa">Carregando...</h1>
+
+        <div id="secao-auth">
+            <p id="auth-titulo">Entre para agendar seu horário</p>
+            
+            <div class="form-group" id="campo-nome" style="display: none;">
+                <label for="auth-nome">Nome Completo</label>
+                <input type="text" id="auth-nome" placeholder="Ex: Maria Silva">
+            </div>
+
+            <div class="form-group">
+                <label for="auth-email">E-mail</label>
+                <input type="email" id="auth-email" placeholder="seu@email.com">
+            </div>
+
+            <div class="form-group">
+                <label for="auth-senha">Senha</label>
+                <input type="password" id="auth-senha" placeholder="Sua senha">
+            </div>
+
+            <button id="btn-auth" onclick="executarAuth()">Entrar</button>
+            <div class="link-toggle" id="toggle-link" onclick="alternarModo()">Não tem conta? Cadastre-se aqui</div>
+        </div>
+
+        <div id="secao-agendamento" style="display: none;">
+            <p>Bem-vinda, <span id="nome-cliente-boasvindas" style="color: #db2777; font-weight: bold;"></span>!</p>
+            
+            <div class="form-group">
+                <label for="servico">Serviço Desejado</label>
+                <select id="servico">
+                    <option value="">Carregando serviços...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="data">Data do Atendimento</label>
+                <input type="date" id="data" onchange="atualizarHorarios()">
+            </div>
+
+            <div class="form-group">
+                <label for="hora">Horário Disponível</label>
+                <select id="hora" disabled>
+                    <option value="">Selecione a data primeiro</option>
+                </select>
+            </div>
+
+            <button onclick="agendar()">Confirmar Agendamento</button>
+            <button class="btn-sair" onclick="location.reload()">Sair da Conta</button>
+        </div>
+    </div>
+
+    <script>
+        let modoAuth = 'login';
+        let dadosUsuario = null;
+
+        // Gerenciar datas passadas
+        const hoje = new Date().toISOString().split('T')[0];
+        document.getElementById('data').setAttribute('min', hoje);
+
+        // --- NOVO: CARREGAR CONFIGURAÇÕES DINÂMICAS ---
+        async function carregarConfiguracoes() {
+            try {
+                const res = await fetch('/api/config');
+                const config = await res.json();
+                
+                // Atualiza o título da página
+                document.getElementById('nome-empresa').innerText = config.nomeEmpresa;
+
+                // Preenche o Select de Serviços
+                const selectServico = document.getElementById('servico');
+                selectServico.innerHTML = ''; // Limpa o "Carregando..."
+
+                config.servicos.forEach(s => {
+                    const option = document.createElement('option');
+                    option.value = `${s.nome} (R$ ${s.preco})`;
+                    option.textContent = `${s.nome} - R$ ${s.preco},00`;
+                    selectServico.appendChild(option);
+                });
+            } catch (e) {
+                console.error("Erro ao carregar configurações:", e);
+                document.getElementById('nome-empresa').innerText = "Erro ao carregar";
+            }
+        }
+
+        // Inicia o carregamento assim que a página abre
+        carregarConfiguracoes();
+
+        function alternarModo() {
+            modoAuth = (modoAuth === 'login') ? 'cadastro' : 'login';
+            document.getElementById('campo-nome').style.display = (modoAuth === 'cadastro') ? 'block' : 'none';
+            document.getElementById('auth-titulo').innerText = (modoAuth === 'login') ? 'Entre para agendar seu horário' : 'Crie sua conta';
+            document.getElementById('btn-auth').innerText = (modoAuth === 'login') ? 'Entrar' : 'Cadastrar';
+            document.getElementById('toggle-link').innerText = (modoAuth === 'login') ? 'Não tem conta? Cadastre-se aqui' : 'Já tem conta? Faça Login';
+        }
+
+        async function executarAuth() {
+            const email = document.getElementById('auth-email').value;
+            const senha = document.getElementById('auth-senha').value;
+            const nome = document.getElementById('auth-nome').value;
+
+            if(!email || !senha || (modoAuth === 'cadastro' && !nome)) {
+                alert("Por favor, preencha todos os campos.");
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, senha, nome, acao: modoAuth })
+                });
+                const dados = await res.json();
+
+                if (res.ok) {
+                    if (modoAuth === 'login') {
+                        dadosUsuario = dados;
+                        document.getElementById('secao-auth').style.display = 'none';
+                        document.getElementById('secao-agendamento').style.display = 'block';
+                        document.getElementById('nome-cliente-boasvindas').innerText = dados.nome;
+                    } else {
+                        alert(dados.mensagem);
+                        alternarModo();
+                    }
+                } else {
+                    alert("Erro: " + dados.mensagem);
+                }
+            } catch (e) { alert("Erro ao conectar com o servidor."); }
+        }
+
+        const horariosMestre = ["09:00", "11:30", "14:00", "16:30"];
+
+        async function atualizarHorarios() {
+            const dataInput = document.getElementById('data').value;
+            const selectHora = document.getElementById('hora');
+            if (!dataInput) return;
+
+            try {
+                const res = await fetch(`/api/horarios-ocupados?data=${dataInput}`);
+                const ocupados = await res.json();
+                selectHora.innerHTML = '<option value="">Escolha um horário</option>';
+                selectHora.disabled = false;
+
+                horariosMestre.forEach(h => {
+                    if (!ocupados.includes(h)) {
+                        const option = document.createElement('option');
+                        option.value = h;
+                        option.textContent = h;
+                        selectHora.appendChild(option);
+                    }
+                });
+
+                if (selectHora.options.length === 1) {
+                    selectHora.innerHTML = '<option value="">Totalmente lotado!</option>';
+                    selectHora.disabled = true;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function agendar() {
+            const servico = document.getElementById('servico').value;
+            const data = document.getElementById('data').value;
+            const hora = document.getElementById('hora').value;
+
+            if(!data || !hora) {
+                alert('Selecione data e hora.');
+                return;
+            }
+
+            try {
+                const resposta = await fetch('/agendar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        nome: dadosUsuario.nome, 
+                        email: dadosUsuario.email, 
+                        servico, data, hora 
+                    })
+                });
+
+                const resultado = await resposta.json();
+
+                if (resposta.ok) {
+                    alert('✅ ' + resultado.mensagem);
+                    document.getElementById('data').value = '';
+                    document.getElementById('hora').innerHTML = '<option value="">Selecione a data primeiro</option>';
+                    document.getElementById('hora').disabled = true;
+                } else {
+                    alert('❌ ' + resultado.mensagem);
+                }
+            } catch (erro) { alert('Erro no servidor.'); }
+        }
+    </script>
+</body>
+</html>

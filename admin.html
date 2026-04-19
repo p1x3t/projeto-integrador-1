@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zanza Admin - Painel de Controle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rosa-escuro: #db2777;
+            --rosa-medio: #f472b6;
+            --rosa-claro: #fdf2f8;
+            --bg: #fafafa;
+            --branco: #ffffff;
+            --texto: #334155;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--texto);
+            margin: 0;
+            display: flex;
+        }
+
+        /* Sidebar - Menu Lateral */
+        .sidebar {
+            width: 260px;
+            background-color: var(--branco);
+            height: 100vh;
+            border-right: 1px solid #e5e7eb;
+            position: fixed;
+            padding: 30px 20px;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--rosa-escuro);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-item {
+            padding: 12px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background-color: var(--rosa-claro);
+            color: var(--rosa-escuro);
+        }
+
+        /* Área Principal */
+        .main-content {
+            margin-left: 260px;
+            padding: 40px;
+            width: 100%;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+            color: #1e293b;
+        }
+
+        header p {
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        /* Cards de Estatísticas (Stats) */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: var(--branco);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: #94a3b8;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .value {
+            font-size: 26px;
+            font-weight: 700;
+            margin-top: 10px;
+            color: var(--rosa-escuro);
+        }
+
+        /* Layout em Colunas (Dashboard) */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .section-card {
+            background: var(--branco);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+        }
+
+        .section-card h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Tabela de Agendamentos */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            font-size: 13px;
+            color: #94a3b8;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pago { background: #dcfce7; color: #166534; }
+        .status-pendente { background: #fef3c7; color: #92400e; }
+
+        /* Formulários de Configuração */
+        .form-group { margin-bottom: 15px; }
+        label { font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px; }
+        input {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            box-sizing: border-box;
+            background: #f8fafc;
+        }
+
+        .btn-salvar {
+            background-color: var(--rosa-escuro);
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-salvar:hover { background-color: #be185d; transform: translateY(-2px); }
+
+        .servico-row {
+            display: flex;
+            gap: 10px;
+            background: var(--rosa-claro);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">🌸 Zanza Admin</div>
+        <div class="menu-item active">🏠 Visão Geral</div>
+        <div class="menu-item">📅 Agendamentos</div>
+        <div class="menu-item">⚙️ Configurações</div>
+        <div class="menu-item" onclick="window.open('/', '_blank')">🌐 Ver Site</div>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1>Dashboard</h1>
+            <p>Acompanhe o desempenho do seu negócio em tempo real.</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Agendamentos Hoje</h3>
+                <div class="value" id="stat-hoje">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total de Clientes</h3>
+                <div class="value" id="stat-clientes">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Receita Mensal</h3>
+                <div class="value" id="stat-receita">R$ 0,00</div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <section class="section-card">
+                <h2>Próximos Atendimentos</h2>
+                <table id="tabela-agendamentos">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Serviço</th>
+                            <th>Data/Hora</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </section>
+
+            <section class="section-card">
+                <h2>Informações do Negócio</h2>
+                <div class="form-group">
+                    <label>Nome da Empresa</label>
+                    <input type="text" id="cfg-nome">
+                </div>
+                <div class="form-group">
+                    <label>Chave PIX</label>
+                    <input type="text" id="cfg-pix">
+                </div>
+                
+                <label>Serviços Ativos</label>
+                <div id="lista-servicos-edit"></div>
+                
+                <button class="btn-salvar" onclick="salvarConfiguracoes()">Atualizar Perfil</button>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // --- CARREGAR AGENDAMENTOS E STATS ---
+        async function carregarDados() {
+            const resA = await fetch('/api/agendamentos');
+            const agendamentos = await resA.json();
+            
+            // Stats
+            const hoje = new Date().toISOString().split('T')[0];
+            const agendadosHoje = agendamentos.filter(a => a.data === hoje);
+            document.getElementById('stat-hoje').innerText = agendadosHoje.length;
+            
+            const clientesUnicos = [...new Set(agendamentos.map(a => a.email))].length;
+            document.getElementById('stat-clientes').innerText = clientesUnicos;
+
+            const receita = agendamentos
+                .filter(a => a.status === 'Pago')
+                .reduce((total, a) => {
+                    const preco = parseFloat(a.servico.match(/\d+/)) || 0;
+                    return total + preco;
+                }, 0);
+            document.getElementById('stat-receita').innerText = `R$ ${receita.toFixed(2)}`;
+
+            // Tabela
+            const corpo = document.querySelector('#tabela-agendamentos tbody');
+            corpo.innerHTML = agendamentos.slice(-5).reverse().map(a => `
+                <tr>
+                    <td><strong>${a.nome}</strong></td>
+                    <td>${a.servico}</td>
+                    <td>${a.data} às ${a.hora}</td>
+                    <td><span class="status-badge ${a.status === 'Pago' ? 'status-pago' : 'status-pendente'}">${a.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // --- CARREGAR CONFIGURAÇÕES ---
+        let servicosMemo = [];
+        async function carregarConfig() {
+            const res = await fetch('/api/config');
+            const config = await res.json();
+            
+            document.getElementById('cfg-nome').value = config.nomeEmpresa;
+            document.getElementById('cfg-pix').value = config.chavePix;
+            servicosMemo = config.servicos;
+
+            const div = document.getElementById('lista-servicos-edit');
+            div.innerHTML = config.servicos.map((s, i) => `
+                <div class="servico-row">
+                    <input type="text" value="${s.nome}" id="nome-${i}" style="flex: 2;">
+                    <input type="number" value="${s.preco}" id="preco-${i}" style="flex: 1;">
+                </div>
+            `).join('');
+        }
+
+        async function salvarConfiguracoes() {
+            const data = {
+                nomeEmpresa: document.getElementById('cfg-nome').value,
+                chavePix: document.getElementById('cfg-pix').value,
+                servicos: servicosMemo.map((s, i) => ({
+                    id: s.id,
+                    nome: document.getElementById(`nome-${i}`).value,
+                    preco: parseFloat(document.getElementById(`preco-${i}`).value)
+                }))
+            };
+
+            const res = await fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if(res.ok) alert("Perfil atualizado com sucesso!");
+        }
+
+        // Iniciar
+        carregarDados();
+        carregarConfig();
+    </script>
+</body>
+</html>

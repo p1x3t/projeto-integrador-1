@@ -109,4 +109,4 @@ app.delete('/api/excluir/:index', (req, res) => {
 
 app.use(express.static(__dirname));
 
-app.listen(3000, () => console.log("🚀 Sistema Zanza ON em http://localhost:3000"));
+app.listen(3000, () => console.log("🚀 Sistema Zanza em http://localhost:3000"));

@@ -5,5 +5,12 @@
     "senha": "$2b$10$Q3VhHs/ryS710i1KrZdyJuTcgBCJQxP9WMhAmJEGezWmqkBkAqisC",
     "tipo": "admin",
     "whatsapp": ""
+  },
+  {
+    "nome": "Kemily Diniz",
+    "email": "kemilydiniz@gmail.com",
+    "senha": "$2b$10$kiWV.V.hsXWb/tf8VjU8ruoQ58AQW/APL8dJf88W5E2O1p7iEh5Ku",
+    "tipo": "cliente",
+    "whatsapp": "11950201858"
   }
 ]

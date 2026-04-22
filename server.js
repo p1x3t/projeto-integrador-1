@@ -54,23 +54,22 @@ app.post('/register', (req, res) => {
     }
 });
 
-// ROTA DE LOGIN
+// ROTA DE LOGIN NO SERVER.JS
 app.post('/login', (req, res) => {
-    // Note que mudei 'password' para 'senha' para bater com o banco
     const { email, senha, tipo } = req.body; 
     try {
         const usuarios = JSON.parse(fs.readFileSync(USERS_PATH, 'utf8'));
+        // Busca o usuário pelo email e pelo tipo (importante para não confundir cliente com admin)
         const u = usuarios.find(user => user.email === email && user.tipo === tipo);
 
         if (u) {
-            // Compara a senha digitada com o hash do banco
             const senhaValida = bcrypt.compareSync(senha, u.senha);
-
             if (senhaValida) {
                 return res.json({ 
                     success: true, 
                     nome: u.nome, 
-                    redirect: tipo === 'admin' ? 'admin.html' : 'cliente.html' 
+                    // MUDANÇA AQUI: Cliente vai para painel.html
+                    redirect: tipo === 'admin' ? 'admin.html' : 'painel.html' 
                 });
             }
         }
@@ -87,6 +86,30 @@ app.get('/api/config', (req, res) => {
 });
 
 app.get('/api/agendamentos', (req, res) => res.json(JSON.parse(fs.readFileSync(FILE_PATH, 'utf8'))));
+
+app.get('/api/estudios', (req, res) => {
+    try {
+        const usuarios = JSON.parse(fs.readFileSync(USERS_PATH, 'utf8'));
+        // Filtra apenas quem é admin e não envia a senha por segurança
+        const listaEstudios = usuarios
+            .filter(u => u.tipo === 'admin')
+            .map(u => ({
+                nome: u.nome,
+                whatsapp: u.whatsapp,
+                // Aqui simulamos dados que o admin cadastrará depois
+                localizacao: u.localizacao || "Endereço não informado",
+                foto: u.foto || "https://via.placeholder.com/400x200",
+                servicos: u.servicos || [
+                    { nome: "Manicure", preco: 40.00 },
+                    { nome: "Alongamento", preco: 120.00 },
+                    { nome: "Cabelo", preco: 80.00 }
+                ]
+            }));
+        res.json(listaEstudios);
+    } catch (err) {
+        res.status(500).json({ error: "Erro ao carregar estúdios" });
+    }
+});
 
 app.post('/agendar', (req, res) => {
     const novo = req.body;

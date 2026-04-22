@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zanza - Área do Cliente</title>
+    <title>Zanza - Painel do Cliente</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -18,12 +18,15 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--bg-green);
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
             margin: 0;
+            padding: 20px;
         }
+
+        .hidden { display: none !important; }
 
         .login-card {
             background: var(--white);
@@ -35,32 +38,62 @@
             text-align: center;
         }
 
-        .logo {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--pantone-pink);
-            margin-bottom: 5px;
+        .container-painel {
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 20px;
         }
 
-        .subtitle {
-            color: var(--text-sub);
-            font-size: 14px;
+        .header-painel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 30px;
+            color: white;
         }
 
-        .form-group {
-            text-align: left;
-            margin-bottom: 15px;
+        .busca-container {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--text-main);
+        .grid-estudios {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
         }
 
+        .card-estudio {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .card-estudio:hover {
+            transform: translateY(-5px);
+            border-color: var(--pantone-pink);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .badge-local {
+            background: #f1f5f9;
+            color: var(--text-sub);
+            font-size: 11px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .form-group { text-align: left; margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+        
         input {
             width: 100%;
             padding: 14px;
@@ -71,23 +104,6 @@
             box-sizing: border-box;
         }
 
-        input:focus {
-            outline: none;
-            border-color: var(--pantone-pink);
-            box-shadow: 0 0 0 4px rgba(194, 30, 86, 0.1);
-        }
-
-        .esqueceu-link {
-            font-size: 12px;
-            display: block;
-            text-align: right;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            color: var(--text-sub);
-            text-decoration: none;
-            cursor: pointer;
-        }
-
         .btn-principal {
             width: 100%;
             padding: 16px;
@@ -96,185 +112,300 @@
             border: none;
             border-radius: 12px;
             font-weight: 700;
-            font-size: 16px;
             cursor: pointer;
             transition: 0.2s;
-            margin-top: 10px;
         }
 
-        .btn-principal:hover {
-            filter: brightness(1.1);
-            transform: translateY(-2px);
-        }
-
-        .footer-links {
-            margin-top: 25px;
-            font-size: 13px;
-        }
-
-        .footer-links a {
-            color: var(--pantone-pink);
-            text-decoration: none;
-            font-weight: 600;
+        .btn-outline {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
             cursor: pointer;
         }
 
-        .hidden { display: none; }
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .grid-horarios {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-hora {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #f8fafc;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-hora.selected {
+            background: var(--pantone-pink);
+            color: white;
+            border-color: var(--pantone-pink);
+        }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <div class="logo">Zanza</div>
-        
-        <div id="section-login">
-            <p class="subtitle">Entre para agendar seu horário</p>
-            <form id="loginFormCliente">
-                <div class="form-group">
-                    <label>E-mail</label>
-                    <input type="email" id="email" placeholder="seu@email.com" required>
-                </div>
-                <div class="form-group">
-                    <label>Senha</label>
-                    <input type="password" id="password" placeholder="••••••••" required>
-                    <a class="esqueceu-link" onclick="mostrarEsqueci()">Esqueceu sua senha?</a>
-                </div>
+    <div id="section-auth" class="login-card">
+        <div style="font-size: 32px; font-weight: 800; color: var(--pantone-pink); margin-bottom: 10px;">Zanza.</div>
+        <div id="auth-login">
+            <p style="color: var(--text-sub); margin-bottom: 25px;">Entre para agendar seu horário</p>
+            <form id="loginForm">
+                <div class="form-group"><input type="email" id="login-email" placeholder="E-mail" required></div>
+                <div class="form-group"><input type="password" id="login-senha" placeholder="Senha" required></div>
                 <button type="submit" class="btn-principal">Entrar</button>
             </form>
-            <div class="footer-links">
-                <p>Não tem conta? <a onclick="mostrarCadastro()">Cadastre-se aqui</a></p>
-                <a href="index.html" style="color: #94a3b8; display: block; margin-top: 15px;">← Voltar</a>
-            </div>
+            <p style="font-size: 13px; margin-top: 20px;">Não tem conta? <a href="#" onclick="alternarAuth(true)" style="color: var(--pantone-pink); font-weight: 600;">Cadastre-se</a></p>
         </div>
 
-        <div id="section-cadastro" class="hidden">
-            <p class="subtitle">Crie sua conta em segundos</p>
-            <form id="registerFormCliente">
-                <div class="form-group">
-                    <label>Nome Completo</label>
-                    <input type="text" id="reg-nome" placeholder="Seu nome" required>
-                </div>
-                <div class="form-group">
-                    <label>E-mail</label>
-                    <input type="email" id="reg-email" placeholder="seu@email.com" required>
-                </div>
-                <div class="form-group">
-                    <label>WhatsApp</label>
-                    <input type="text" id="reg-whatsapp" placeholder="(00) 00000-0000" required>
-                </div>
-                <div class="form-group">
-                    <label>Crie uma Senha</label>
-                    <input type="password" id="reg-senha" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn-principal">Criar Conta</button>
+        <div id="auth-cadastro" class="hidden">
+            <p style="color: var(--text-sub); margin-bottom: 25px;">Crie sua conta em segundos</p>
+            <form id="registerForm">
+                <div class="form-group"><input type="text" id="reg-nome" placeholder="Nome Completo" required></div>
+                <div class="form-group"><input type="email" id="reg-email" placeholder="E-mail" required></div>
+                <div class="form-group"><input type="text" id="reg-whats" placeholder="WhatsApp" required></div>
+                <div class="form-group"><input type="password" id="reg-senha" placeholder="Senha" required></div>
+                <button type="submit" class="btn-principal">Criar Minha Conta</button>
             </form>
-            <div class="footer-links">
-                <p>Já tem conta? <a onclick="voltarAoLogin()">Fazer Login</a></p>
-            </div>
+            <p style="font-size: 13px; margin-top: 20px;">Já tem conta? <a href="#" onclick="alternarAuth(false)" style="color: var(--pantone-pink); font-weight: 600;">Fazer Login</a></p>
+        </div>
+    </div>
+
+    <div id="section-painel" class="container-painel hidden">
+        <div class="header-painel">
+            <h1 style="margin: 0;">Olá, <span id="span-nome-cliente">Usuário</span>!</h1>
+            <button class="btn-outline" onclick="logout()">Sair</button>
         </div>
 
-        <div id="section-esqueci" class="hidden">
-            <p class="subtitle">Redefina sua senha de acesso</p>
-            <div class="form-group">
-                <label>Seu E-mail cadastrado</label>
-                <input type="email" id="reset-email" placeholder="seu@email.com" required>
-            </div>
-            <div class="form-group">
-                <label>Nova Senha</label>
-                <input type="password" id="reset-nova-senha" placeholder="Mínimo 4 caracteres" required>
-            </div>
-            <button onclick="redefinirSenha()" class="btn-principal">Atualizar Senha</button>
-            <div class="footer-links">
-                <p><a onclick="voltarAoLogin()">Voltar para o Login</a></p>
+        <div class="busca-container">
+            <label style="font-weight: 800; font-size: 14px; display: block; margin-bottom: 10px; color: var(--text-main);">Procurar Estúdios por Localização ou Nome</label>
+            <input type="text" id="input-busca" placeholder="Ex: Cidade Tiradentes, Lanails Arte..." onkeyup="filtrarEstudios()">
+        </div>
+
+        <div class="grid-estudios" id="container-estudios"></div>
+    </div>
+
+    <div id="modal-perfil" class="modal">
+        <div class="login-card" style="max-width: 600px; padding: 0; overflow: hidden;">
+            <img id="perfil-foto" src="" style="width: 100%; height: 200px; object-fit: cover; background: #eee;">
+            <div style="padding: 30px;">
+                <h2 id="perfil-nome" style="margin: 0; color: var(--pantone-pink);"></h2>
+                <p id="perfil-local" style="font-size: 14px; color: var(--text-sub); margin: 5px 0 20px 0;"></p>
+                <h3 style="font-size: 16px; text-align: left; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Serviços e Preços</h3>
+                <div id="perfil-servicos" style="margin-bottom: 25px;"></div>
+                <button class="btn-principal" onclick="irParaAgenda()">Escolher Data e Horário</button>
+                <button class="btn-outline" style="color: var(--text-sub); border: none; margin-top: 10px;" onclick="fecharPerfil()">Voltar</button>
             </div>
         </div>
     </div>
 
+    <div id="modal-agenda" class="modal">
+        <div class="login-card" style="max-width: 450px;">
+            <h3 id="modal-titulo" style="margin-top: 0;">Agendar Horário</h3>
+            <div style="background: #f1f5f9; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px;">
+                <p style="margin: 0; color: var(--text-sub);">Serviço selecionado:</p>
+                <strong id="resumo-servico" style="color: var(--pantone-pink);">---</strong>
+            </div>
+            <div class="form-group">
+                <label>Selecione a Data</label>
+                <input type="date" id="input-data">
+            </div>
+            <div class="form-group">
+                <label>Horários Disponíveis</label>
+                <div class="grid-horarios" id="container-horas"></div>
+            </div>
+            <button class="btn-principal" style="margin-top: 20px;" onclick="confirmarAgendamento()">Confirmar Agendamento</button>
+            <button class="btn-outline" style="color: var(--text-sub); border-color: var(--border); margin-top: 10px; width: 100%;" onclick="fecharModal()">Cancelar</button>
+        </div>
+    </div>
+
     <script>
-        // --- FUNÇÕES DE NAVEGAÇÃO DA TELA ---
-        function mostrarCadastro() {
-            document.getElementById('section-login').classList.add('hidden');
-            document.getElementById('section-esqueci').classList.add('hidden');
-            document.getElementById('section-cadastro').classList.remove('hidden');
+        // Variáveis globais
+        let estudiosReais = []; 
+        let estudioAtual = null;
+        let servicoSelecionado = null;
+        let horaSelecionada = "";
+
+        window.onload = async () => {
+            const usuario = localStorage.getItem('usuarioNome');
+            if (usuario) {
+                mostrarPainel(usuario);
+                await buscarEstudiosDoServidor();
+            }
+        };
+
+        async function buscarEstudiosDoServidor() {
+            try {
+                const res = await fetch('/api/estudios');
+                estudiosReais = await res.json();
+                renderizarEstudios(estudiosReais);
+            } catch (err) {
+                console.error("Erro ao buscar estúdios:", err);
+            }
         }
 
-        function mostrarEsqueci() {
-            document.getElementById('section-login').classList.add('hidden');
-            document.getElementById('section-cadastro').classList.add('hidden');
-            document.getElementById('section-esqueci').classList.remove('hidden');
+        function mostrarPainel(nome) {
+            document.getElementById('section-auth').classList.add('hidden');
+            document.getElementById('section-painel').classList.remove('hidden');
+            document.getElementById('span-nome-cliente').innerText = nome;
         }
 
-        function voltarAoLogin() {
-            document.getElementById('section-cadastro').classList.add('hidden');
-            document.getElementById('section-esqueci').classList.add('hidden');
-            document.getElementById('section-login').classList.remove('hidden');
-        }
-
-        // --- LÓGICA DE LOGIN ---
-        document.getElementById('loginFormCliente').addEventListener('submit', async (e) => {
+        // Lógica de Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            const response = await fetch('/login', {
+            const email = document.getElementById('login-email').value;
+            const senha = document.getElementById('login-senha').value;
+            const res = await fetch('/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password, tipo: 'cliente' })
+                body: JSON.stringify({ email, senha, tipo: 'cliente' })
             });
-
-            const data = await response.json();
+            const data = await res.json();
             if (data.success) {
-                window.location.href = 'cliente.html'; 
-            } else {
-                alert(data.message || "Erro ao entrar. Verifique seus dados.");
-            }
+                localStorage.setItem('usuarioNome', data.nome);
+                mostrarPainel(data.nome);
+                await buscarEstudiosDoServidor();
+            } else { alert(data.message); }
         });
 
-        // --- LÓGICA DE CADASTRO ---
-        document.getElementById('registerFormCliente').addEventListener('submit', async (e) => {
+        // Lógica de Cadastro
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const dados = {
                 nome: document.getElementById('reg-nome').value,
                 email: document.getElementById('reg-email').value,
+                whatsapp: document.getElementById('reg-whats').value,
                 senha: document.getElementById('reg-senha').value,
-                whatsapp: document.getElementById('reg-whatsapp').value
+                tipo: 'cliente'
             };
-
-            const response = await fetch('/api/registrar', {
+            const res = await fetch('/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dados)
             });
-
-            const data = await response.json();
+            const data = await res.json();
             if (data.success) {
-                alert("Cadastro realizado! Agora faça seu login.");
-                voltarAoLogin();
-            } else {
-                alert("Erro: " + (data.message || "Não foi possível cadastrar."));
-            }
+                alert("Conta criada! Faça seu login.");
+                alternarAuth(false);
+            } else { alert(data.message); }
         });
 
-        // --- LÓGICA DE REDEFINIR SENHA ---
-        async function redefinirSenha() {
-            const email = document.getElementById('reset-email').value;
-            const novaSenha = document.getElementById('reset-nova-senha').value;
+        function alternarAuth(mostrarCadastro) {
+            document.getElementById('auth-login').classList.toggle('hidden', mostrarCadastro);
+            document.getElementById('auth-cadastro').classList.toggle('hidden', !mostrarCadastro);
+        }
 
-            if (!email || !novaSenha) return alert("Preencha todos os campos!");
+        function renderizarEstudios(lista) {
+            const container = document.getElementById('container-estudios');
+            container.innerHTML = lista.map(est => `
+                <div class="card-estudio">
+                    <span class="badge-local">${est.localizacao || 'Cidade Tiradentes'}</span>
+                    <h3 style="margin: 15px 0 5px 0; color: var(--text-main);">${est.nome}</h3>
+                    <button class="btn-principal" onclick="verPerfil('${est.nome}')" style="margin-top:10px;">Ver Serviços e Agendar</button>
+                </div>
+            `).join('');
+        }
 
-            const response = await fetch('/api/redefinir-senha', {
+        function filtrarEstudios() {
+            const termo = document.getElementById('input-busca').value.toLowerCase();
+            const filtrados = estudiosReais.filter(e => 
+                e.nome.toLowerCase().includes(termo) || (e.localizacao && e.localizacao.toLowerCase().includes(termo))
+            );
+            renderizarEstudios(filtrados);
+        }
+
+        function verPerfil(nomeEstudio) {
+            const est = estudiosReais.find(e => e.nome === nomeEstudio);
+            estudioAtual = est;
+            
+            document.getElementById('perfil-foto').src = est.foto || "https://via.placeholder.com/400x200";
+            document.getElementById('perfil-nome').innerText = est.nome;
+            document.getElementById('perfil-local').innerText = "📍 " + (est.localizacao || "Endereço não informado");
+            
+            const listaServicos = document.getElementById('perfil-servicos');
+            listaServicos.innerHTML = est.servicos.map(s => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #eee;">
+                    <div style="text-align: left;">
+                        <input type="radio" name="servico" id="${s.nome}" onclick="selecionarServico('${s.nome}', ${s.preco})">
+                        <label for="${s.nome}" style="font-weight: 600; cursor: pointer; margin-left: 8px;">${s.nome}</label>
+                    </div>
+                    <span style="color: var(--pantone-pink); font-weight: 800;">R$ ${s.preco.toFixed(2)}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('modal-perfil').style.display = 'flex';
+        }
+
+        function selecionarServico(nome, preco) {
+            servicoSelecionado = { nome, preco };
+        }
+
+        function irParaAgenda() {
+            if (!servicoSelecionado) return alert("Por favor, selecione um serviço primeiro!");
+            document.getElementById('resumo-servico').innerText = `${servicoSelecionado.nome} - R$ ${servicoSelecionado.preco.toFixed(2)}`;
+            document.getElementById('modal-perfil').style.display = 'none';
+            abrirAgenda(estudioAtual.nome); 
+        }
+
+        function fecharPerfil() { document.getElementById('modal-perfil').style.display = 'none'; }
+
+        function abrirAgenda(nomeEstudio) {
+            document.getElementById('modal-titulo').innerText = "Agendar em " + nomeEstudio;
+            document.getElementById('modal-agenda').style.display = 'flex';
+            const horas = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"];
+            const container = document.getElementById('container-horas');
+            container.innerHTML = horas.map(h => `<button class="btn-hora" onclick="selecionarHora(this)">${h}</button>`).join('');
+        }
+
+        function selecionarHora(btn) {
+            document.querySelectorAll('.btn-hora').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            horaSelecionada = btn.innerText;
+        }
+
+        function fecharModal() { document.getElementById('modal-agenda').style.display = 'none'; }
+
+        async function confirmarAgendamento() {
+            const data = document.getElementById('input-data').value;
+            if (!data || !horaSelecionada) return alert("Selecione data e hora!");
+
+            const novoAgendamento = {
+                cliente: localStorage.getItem('usuarioNome'),
+                estudio: estudioAtual.nome,
+                servico: servicoSelecionado.nome,
+                preco: servicoSelecionado.preco,
+                data: data,
+                hora: horaSelecionada
+            };
+
+            const res = await fetch('/agendar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, novaSenha })
+                body: JSON.stringify(novoAgendamento)
             });
 
-            const data = await response.json();
-            if (data.success) {
-                alert("Senha atualizada com sucesso! Use a nova senha para entrar.");
-                voltarAoLogin();
-            } else {
-                alert(data.message || "Erro ao atualizar senha.");
-            }
+            const result = await res.json();
+            alert(result.mensagem || "Agendamento realizado!");
+            fecharModal();
+        }
+
+        function logout() {
+            localStorage.removeItem('usuarioNome');
+            location.reload();
         }
     </script>
 </body>

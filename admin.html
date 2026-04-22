@@ -144,6 +144,10 @@ input, select { padding: 10px; border: 1px solid var(--border); border-radius: 8
     <div class="menu-item" onclick="trocarAba('agendamentos', this)">Agendamentos</div>
     <div class="menu-item" onclick="trocarAba('servicos', this)">Serviços</div>
     <div class="menu-item" onclick="trocarAba('perfil', this)">Meu Perfil</div>
+    
+    <div class="menu-item" onclick="logoutAdmin()" style="margin-top: auto; color: #d32f2f; border-top: 1px solid #eee; padding-top: 20px;">
+        <span style="filter: grayscale(1);">🚪</span> Sair do Painel
+    </div>
 </aside>
 
 <main class="main-content">
@@ -260,13 +264,42 @@ input, select { padding: 10px; border: 1px solid var(--border); border-radius: 8
 </main>
 
 <script>
-function trocarAba(abaId, elemento) {
-    document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
-    document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-    
-    document.getElementById('aba-' + abaId).classList.add('ativa');
-    if(elemento) elemento.classList.add('active');
-}
+    // 1. TRAVA DE SEGURANÇA: Roda antes de qualquer coisa carregar
+    function verificarAcesso() {
+        const tipoUsuario = localStorage.getItem('usuarioTipo');
+        
+        // Se não for admin, bloqueia e redireciona
+        if (tipoUsuario !== 'admin') {
+            alert("Acesso restrito! Por favor, faça login como profissional.");
+            window.location.href = "index.html"; 
+        }
+    }
+
+    // Executa a trava imediatamente
+    verificarAcesso();
+
+    // 2. FUNÇÃO DE TROCAR ABAS
+    function trocarAba(abaId, elemento) {
+        document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
+        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+        
+        document.getElementById('aba-' + abaId).classList.add('ativa');
+        if(elemento) elemento.classList.add('active');
+    }
+
+    // 3. FUNÇÃO DE LOGOUT
+    function logoutAdmin() {
+        localStorage.removeItem('usuarioNome');
+        localStorage.removeItem('usuarioTipo');
+        window.location.href = "index.html";
+    }
+
+    // 4. CARREGAMENTO INICIAL
+    window.onload = () => {
+        const nomeAdmin = localStorage.getItem('usuarioNome');
+        console.log("Painel administrativo carregado para: " + nomeAdmin);
+        // Aqui você pode adicionar funções para buscar dados do banco no futuro
+    };
 </script>
 
 </body>

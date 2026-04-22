@@ -54,28 +54,31 @@ app.post('/register', (req, res) => {
     }
 });
 
-// ROTA DE LOGIN NO SERVER.JS
+// ROTA DE LOGIN NO SERVER.JS ATUALIZADA
 app.post('/login', (req, res) => {
     const { email, senha, tipo } = req.body; 
     try {
         const usuarios = JSON.parse(fs.readFileSync(USERS_PATH, 'utf8'));
-        // Busca o usuário pelo email e pelo tipo (importante para não confundir cliente com admin)
+        
+        // Busca o usuário pelo email e pelo tipo
         const u = usuarios.find(user => user.email === email && user.tipo === tipo);
 
         if (u) {
             const senhaValida = bcrypt.compareSync(senha, u.senha);
             if (senhaValida) {
+                // Se for admin, enviamos o redirecionamento. 
+                // Se for cliente, não redirecionamos, apenas confirmamos o sucesso.
                 return res.json({ 
                     success: true, 
-                    nome: u.nome, 
-                    // MUDANÇA AQUI: Cliente vai para painel.html
-                    redirect: tipo === 'admin' ? 'admin.html' : 'painel.html' 
+                    nome: u.nome,
+                    tipo: u.tipo, // Enviamos o tipo para o frontend saber quem logou
+                    redirect: tipo === 'admin' ? 'admin.html' : null 
                 });
             }
         }
-        res.status(401).json({ success: false, message: "E-mail ou senha incorretos." });
+        res.status(401).json({ success: false, message: "E-mail ou senha incorretos para este tipo de acesso." });
     } catch (err) {
-        res.status(500).json({ success: false, message: "Erro no servidor." });
+        res.status(500).json({ success: false, message: "Erro ao processar login." });
     }
 });
 

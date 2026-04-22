@@ -3,134 +3,512 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zanza</title>
+    <title>Zanza - Explore Estúdios</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --pantone-pink: #C21E56;
-            --sober-green: #255a44;
             --bg-green: #6faf8f;
             --white: #ffffff;
-            --dark: #2d3436;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            --border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--bg-green);
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        /* Card Central */
-        .welcome-card {
-            background: var(--white);
-            padding: 50px 40px;
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-            width: 100%;
-            max-width: 420px;
-            text-align: center;
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .logo {
-            font-size: 42px;
-            font-weight: 800;
-            color: var(--pantone-pink);
-            margin-bottom: 10px;
-            letter-spacing: -1px;
-        }
-
-        .subtitle {
-            color: #636e72;
-            font-size: 16px;
-            margin-bottom: 40px;
-            line-height: 1.4;
-        }
-
-        /* Botões de Acesso */
-        .access-options {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            align-items: center;
         }
 
-        .btn {
+        .hidden { display: none !important; }
+
+        /* NAVBAR */
+        nav {
+            width: 100%;
+            background: var(--white);
+            padding: 15px 0;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 900;
             display: flex;
+            justify-content: center;
+        }
+
+        .nav-content {
+            width: 90%;
+            max-width: 1100px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* CONTAINER PRINCIPAL */
+        .container-vitrine {
+            width: 90%;
+            max-width: 1100px;
+            margin-top: 40px;
+            padding-bottom: 50px;
+        }
+
+        .busca-container {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        /* GRID DE ESTÚDIOS */
+        .grid-estudios {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .card-estudio {
+            background: white;
+            border-radius: 24px;
+            padding: 0;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+
+        .card-estudio:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .card-info { padding: 25px; text-align: left; }
+
+        /* BOTÕES E INPUTS */
+        .btn-principal {
+            background: var(--pantone-pink);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-principal:hover { opacity: 0.9; transform: scale(1.02); }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: #f8fafc;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        /* MODAIS */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75);
+            display: none;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            padding: 18px;
-            border-radius: 14px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            border: none;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 28px;
+            width: 90%;
+            max-width: 450px;
+            position: relative;
+            text-align: center;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px; right: 20px;
+            font-size: 24px;
             cursor: pointer;
+            color: var(--text-sub);
         }
 
-        /* Botão Cliente - Rosa */
-        .btn-cliente {
-            background-color: var(--pantone-pink);
-            color: var(--white);
-            box-shadow: 0 4px 15px rgba(194, 30, 86, 0.3);
+        /* COMPONENTES DE AGENDAMENTO */
+        .grid-horarios {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
         }
 
-        .btn-cliente:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(194, 30, 86, 0.4);
-            filter: brightness(1.1);
+        .btn-hora {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #f8fafc;
+            cursor: pointer;
+            font-weight: 600;
         }
 
-        /* Botão Empresa - Escuro/Verde */
-        .btn-admin {
-            background-color: var(--dark);
-            color: var(--white);
+        .btn-hora.selected {
+            background: var(--pantone-pink);
+            color: white;
+            border-color: var(--pantone-pink);
         }
 
-        .btn-admin:hover {
-            background-color: var(--sober-green);
-            transform: translateY(-3px);
-        }
-
-        .footer-info {
-            margin-top: 30px;
-            font-size: 12px;
-            color: #b2bec3;
+        .badge-local {
+            background: #f1f5f9;
+            color: var(--text-sub);
+            font-size: 11px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
 <body>
 
-    <div class="welcome-card">
-        <div class="logo">Zanza.</div>
-        <p class="subtitle">Seja bem-vinda à nossa plataforma de agendamento. Como deseja acessar?</p>
-
-    <div class="access-options">
-    <a href="login-cliente.html" class="btn btn-cliente">Área da Cliente</a>
-
-    <a href="login-admin.html" class="btn btn-admin">Empresa</a>
+    <nav>
+        <div class="nav-content">
+    <div style="font-size: 28px; font-weight: 800; color: var(--pantone-pink); cursor: pointer;" onclick="location.reload()">Zanza.</div>
+    <div id="nav-auth-controls" style="display: flex; align-items: center; gap: 20px;">
+<a href="javascript:void(0)" 
+   onclick="abrirModalAuth('admin')" 
+   style="font-size: 14px; color: var(--text-sub); font-weight: 600; text-decoration: none; transition: 0.2s;" 
+   onmouseover="this.style.color='var(--pantone-pink)'" 
+   onmouseout="this.style.color='var(--text-sub)'">
+   Sou Profissional
+</a>        
+        <button class="btn-principal" style="padding: 10px 25px;" onclick="abrirModalAuth()">Entrar</button>
+    </div>
 </div>
+            </div>
+        </div>
+    </nav>
 
-        <div class="footer-info">
-            &copy; 2026 Zanza • Gestão Inteligente
+    <div class="container-vitrine">
+        <div class="busca-container">
+            <h2 style="margin: 0 0 15px 0; color: var(--text-main); font-size: 20px;">Encontre o estúdio perfeito para você</h2>
+            <input type="text" id="input-busca" placeholder="Busque por nome ou bairro (Ex: Tatuapé, Vila Formosa, Cidade Tiradentes)" onkeyup="filtrarEstudios()">
+        </div>
+
+        <div class="grid-estudios" id="container-estudios">
+            </div>
+    </div>
+
+    <div id="modal-auth" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="fecharModalAuth()">&times;</span>
+            <div id="auth-login">
+                <h2 style="color: var(--pantone-pink); margin-bottom: 10px;">Bem-vinda de volta!</h2>
+                <p style="color: var(--text-sub); margin-bottom: 30px;">Entre para gerenciar seus agendamentos</p>
+                <form id="loginForm">
+                    <input type="email" id="login-email" placeholder="Seu e-mail" required style="margin-bottom: 15px;">
+                    <input type="password" id="login-senha" placeholder="Sua senha" required style="margin-bottom: 20px;">
+                    <button type="submit" class="btn-principal" style="width: 100%;">Entrar</button>
+                </form>
+                <p style="font-size: 14px; margin-top: 25px;">Não tem conta? <a href="#" onclick="alternarAuth(true)" style="color: var(--pantone-pink); font-weight: 700; text-decoration: none;">Cadastre-se agora</a></p>
+            </div>
+
+            <div id="auth-cadastro" class="hidden">
+                <h2 style="color: var(--pantone-pink); margin-bottom: 10px;">Criar Conta</h2>
+                <p style="color: var(--text-sub); margin-bottom: 30px;">Rapidez e facilidade para seus cuidados</p>
+                <form id="registerForm">
+                    <input type="text" id="reg-nome" placeholder="Nome Completo" required style="margin-bottom: 15px;">
+                    <input type="email" id="reg-email" placeholder="E-mail" required style="margin-bottom: 15px;">
+                    <input type="text" id="reg-whats" placeholder="WhatsApp" required style="margin-bottom: 15px;">
+                    <input type="password" id="reg-senha" placeholder="Crie uma senha" required style="margin-bottom: 20px;">
+                    <button type="submit" class="btn-principal" style="width: 100%;">Finalizar Cadastro</button>
+                </form>
+                <p style="font-size: 14px; margin-top: 25px;">Já é cadastrada? <a href="#" onclick="alternarAuth(false)" style="color: var(--pantone-pink); font-weight: 700; text-decoration: none;">Fazer Login</a></p>
+            </div>
         </div>
     </div>
+
+    <div id="modal-perfil" class="modal">
+        <div class="modal-content" style="max-width: 600px; padding: 0; overflow: hidden;">
+            <span class="close-modal" onclick="fecharPerfil()" style="color: white; z-index: 10;">&times;</span>
+            <img id="perfil-foto" src="" style="width: 100%; height: 220px; object-fit: cover; background: #ddd;">
+            <div style="padding: 30px; text-align: left;">
+                <h2 id="perfil-nome" style="margin: 0; color: var(--pantone-pink); font-size: 24px;"></h2>
+                <p id="perfil-local" style="font-size: 14px; color: var(--text-sub); margin: 8px 0 25px 0;"></p>
+                
+                <h3 style="font-size: 16px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 15px;">Escolha o Serviço</h3>
+                <div id="perfil-servicos" style="max-height: 200px; overflow-y: auto; margin-bottom: 30px;"></div>
+
+                <button class="btn-principal" style="width: 100%;" onclick="irParaAgenda()">Próximo: Escolher Horário</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-agenda" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="fecharModal()">&times;</span>
+            <h3 id="modal-titulo" style="margin-top: 0;">Finalizar Agendamento</h3>
+            <div style="background: #fff5f8; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: left; border: 1px solid #ffe4ed;">
+                <p style="margin: 0; color: var(--text-sub); font-size: 12px; font-weight: 700; text-transform: uppercase;">Serviço:</p>
+                <strong id="resumo-servico" style="color: var(--pantone-pink); font-size: 16px;">---</strong>
+            </div>
+            <div style="text-align: left; margin-bottom: 15px;">
+                <label style="font-weight: 700; font-size: 13px;">Escolha o dia</label>
+                <input type="date" id="input-data" style="margin-top: 8px;">
+            </div>
+            <div style="text-align: left;">
+                <label style="font-weight: 700; font-size: 13px;">Horários disponíveis</label>
+                <div class="grid-horarios" id="container-horas"></div>
+            </div>
+            <button class="btn-principal" style="width: 100%; margin-top: 30px;" onclick="confirmarAgendamento()">Confirmar e Reservar</button>
+        </div>
+    </div>
+
+   <script>
+    let estudiosReais = []; 
+    let estudioAtual = null;
+    let servicoSelecionado = null;
+    let horaSelecionada = "";
+    let tipoLoginAtual = 'cliente'; // Variável para controlar se o modal está em modo cliente ou admin
+
+    window.onload = async () => {
+        await buscarEstudiosDoServidor();
+        
+        const usuario = localStorage.getItem('usuarioNome');
+        if (usuario) {
+            atualizarNavbarLogado(usuario);
+        }
+    };
+
+    async function buscarEstudiosDoServidor() {
+        try {
+            const res = await fetch('/api/estudios');
+            estudiosReais = await res.json();
+            renderizarEstudios(estudiosReais);
+        } catch (err) {
+            console.error("Erro ao carregar vitrine:", err);
+        }
+    }
+
+    function renderizarEstudios(lista) {
+        const container = document.getElementById('container-estudios');
+        container.innerHTML = lista.map(est => `
+            <div class="card-estudio">
+                <div style="height: 160px; background: #eee; background-image: url('${est.foto || 'https://via.placeholder.com/400x200'}'); background-size: cover; background-position: center;"></div>
+                <div class="card-info">
+                    <span class="badge-local">${est.localizacao || 'São Paulo'}</span>
+                    <h3 style="margin: 15px 0 10px 0; color: var(--text-main);">${est.nome}</h3>
+                    <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 20px;">Serviços de manicure, cabelo, cílios e mais.</p>
+                    <button class="btn-principal" style="width: 100%;" onclick="verPerfil('${est.nome}')">Conhecer e Agendar</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function filtrarEstudios() {
+        const termo = document.getElementById('input-busca').value.toLowerCase();
+        const filtrados = estudiosReais.filter(e => 
+            e.nome.toLowerCase().includes(termo) || (e.localizacao && e.localizacao.toLowerCase().includes(termo))
+        );
+        renderizarEstudios(filtrados);
+    }
+
+    function verPerfil(nomeEstudio) {
+        const est = estudiosReais.find(e => e.nome === nomeEstudio);
+        estudioAtual = est;
+        document.getElementById('perfil-foto').src = est.foto || "https://via.placeholder.com/400x200";
+        document.getElementById('perfil-nome').innerText = est.nome;
+        document.getElementById('perfil-local').innerText = "📍 " + (est.localizacao || "Endereço não informado");
+        
+        const listaServicos = document.getElementById('perfil-servicos');
+        listaServicos.innerHTML = est.servicos.map(s => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #f1f5f9; cursor: pointer;" onclick="document.getElementById('rad-${s.nome}').click()">
+                <div>
+                    <input type="radio" name="servico" id="rad-${s.nome}" onclick="selecionarServico('${s.nome}', ${s.preco})">
+                    <label style="font-weight: 600; margin-left: 8px; cursor:pointer;">${s.nome}</label>
+                </div>
+                <span style="color: var(--pantone-pink); font-weight: 800;">R$ ${s.preco.toFixed(2)}</span>
+            </div>
+        `).join('');
+
+        document.getElementById('modal-perfil').style.display = 'flex';
+    }
+
+    function selecionarServico(nome, preco) {
+        servicoSelecionado = { nome, preco };
+    }
+
+    function irParaAgenda() {
+        if (!servicoSelecionado) return alert("Por favor, selecione um serviço!");
+
+        const usuario = localStorage.getItem('usuarioNome');
+        if (!usuario) {
+            fecharPerfil();
+            abrirModalAuth('cliente'); // Garante que abre como cliente ao tentar agendar
+            return;
+        }
+
+        document.getElementById('resumo-servico').innerText = `${servicoSelecionado.nome} - R$ ${servicoSelecionado.preco.toFixed(2)}`;
+        document.getElementById('modal-perfil').style.display = 'none';
+        abrirAgenda(estudioAtual.nome);
+    }
+
+    function abrirAgenda(nomeEstudio) {
+        document.getElementById('modal-titulo').innerText = "Agendar em " + nomeEstudio;
+        document.getElementById('modal-agenda').style.display = 'flex';
+        const horas = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
+        const container = document.getElementById('container-horas');
+        container.innerHTML = horas.map(h => `<button class="btn-hora" onclick="selecionarHora(this)">${h}</button>`).join('');
+    }
+
+    function selecionarHora(btn) {
+        document.querySelectorAll('.btn-hora').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        horaSelecionada = btn.innerText;
+    }
+
+    // --- NOVA FUNÇÃO DE ABERTURA DE MODAL INTELIGENTE ---
+    function abrirModalAuth(tipo = 'cliente') { 
+        tipoLoginAtual = tipo; 
+        const modal = document.getElementById('modal-auth');
+        const tituloLogin = modal.querySelector('#auth-login h2');
+        
+        if (tipo === 'admin') {
+            tituloLogin.innerText = "Painel da Empresa";
+            tituloLogin.style.color = "var(--text-main)"; // Diferencia visualmente o login admin
+        } else {
+            tituloLogin.innerText = "Bem-vinda de volta!";
+            tituloLogin.style.color = "var(--pantone-pink)";
+        }
+        
+        modal.style.display = 'flex'; 
+    }
+
+    function fecharModalAuth() { document.getElementById('modal-auth').style.display = 'none'; }
+    function fecharPerfil() { document.getElementById('modal-perfil').style.display = 'none'; }
+    function fecharModal() { document.getElementById('modal-agenda').style.display = 'none'; }
+
+    function alternarAuth(mostrarCadastro) {
+        document.getElementById('auth-login').classList.toggle('hidden', mostrarCadastro);
+        document.getElementById('auth-cadastro').classList.toggle('hidden', !mostrarCadastro);
+    }
+
+    function atualizarNavbarLogado(nome) {
+        const controls = document.getElementById('nav-auth-controls');
+        controls.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span style="font-weight: 700; color: var(--text-main); font-size: 14px;">Olá, ${nome.split(' ')[0]} 👋</span>
+                <button class="btn-outline" onclick="logout()">Sair</button>
+            </div>
+        `;
+    }
+
+    // Lógica de Login via formulário AJUSTADA
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const senha = document.getElementById('login-senha').value;
+        
+        const res = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                email, 
+                senha, 
+                tipo: tipoLoginAtual // Envia 'cliente' ou 'admin' dependendo de como o modal foi aberto
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            localStorage.setItem('usuarioNome', data.nome);
+            localStorage.setItem('usuarioTipo', data.tipo);
+
+            if (data.redirect) {
+                // Se for empresa (admin), o servidor enviou a URL de redirecionamento
+                window.location.href = data.redirect;
+            } else {
+                // Se for cliente, apenas fecha o modal e atualiza a barra
+                fecharModalAuth();
+                atualizarNavbarLogado(data.nome);
+                alert(`Olá ${data.nome.split(' ')[0]}, login realizado com sucesso!`);
+            }
+        } else {
+            alert(data.message);
+        }
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const dados = {
+            nome: document.getElementById('reg-nome').value,
+            email: document.getElementById('reg-email').value,
+            whatsapp: document.getElementById('reg-whats').value,
+            senha: document.getElementById('reg-senha').value,
+            tipo: 'cliente'
+        };
+        const res = await fetch('/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert("Conta criada! Já pode fazer seu login.");
+            alternarAuth(false);
+        } else { alert(data.message); }
+    });
+
+    async function confirmarAgendamento() {
+        const data = document.getElementById('input-data').value;
+        if (!data || !horaSelecionada) return alert("Selecione data e hora!");
+
+        const novoAgendamento = {
+            cliente: localStorage.getItem('usuarioNome'),
+            estudio: estudioAtual.nome,
+            servico: servicoSelecionado.nome,
+            preco: servicoSelecionado.preco,
+            data: data,
+            hora: horaSelecionada
+        };
+
+        const res = await fetch('/agendar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(novoAgendamento)
+        });
+
+        const result = await res.json();
+        alert(result.mensagem || "Agendamento realizado!");
+        fecharModal();
+    }
+
+    function logout() {
+        localStorage.removeItem('usuarioNome');
+        localStorage.removeItem('usuarioTipo');
+        location.reload();
+    }
+</script>
 
 </body>
 </html>

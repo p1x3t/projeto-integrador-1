@@ -2,21 +2,135 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zanza</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; background: #fdf2f8; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .box { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
-        h1 { color: #db2777; }
-        .btn { display: block; width: 250px; padding: 15px; margin: 10px auto; border-radius: 10px; text-decoration: none; color: white; font-weight: bold; }
-        .cliente { background: #db2777; }
-        .admin { background: #444; }
+        :root {
+            --pantone-pink: #C21E56;
+            --sober-green: #255a44;
+            --bg-green: #6faf8f;
+            --white: #ffffff;
+            --dark: #2d3436;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-green);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Card Central */
+        .welcome-card {
+            background: var(--white);
+            padding: 50px 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--pantone-pink);
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: #636e72;
+            font-size: 16px;
+            margin-bottom: 40px;
+            line-height: 1.4;
+        }
+
+        /* Botões de Acesso */
+        .access-options {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 18px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Botão Cliente - Rosa */
+        .btn-cliente {
+            background-color: var(--pantone-pink);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(194, 30, 86, 0.3);
+        }
+
+        .btn-cliente:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(194, 30, 86, 0.4);
+            filter: brightness(1.1);
+        }
+
+        /* Botão Empresa - Escuro/Verde */
+        .btn-admin {
+            background-color: var(--dark);
+            color: var(--white);
+        }
+
+        .btn-admin:hover {
+            background-color: var(--sober-green);
+            transform: translateY(-3px);
+        }
+
+        .footer-info {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #b2bec3;
+        }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h1>Zanza</h1>
-        <a href="/cliente" class="btn cliente">🙋‍♀️ Área da Cliente</a>
-        <a href="/admin" class="btn admin">⚙️ Painel Admin</a>
+
+    <div class="welcome-card">
+        <div class="logo">Zanza.</div>
+        <p class="subtitle">Seja bem-vinda à nossa plataforma de agendamento. Como deseja acessar?</p>
+
+    <div class="access-options">
+    <a href="cliente.html" class="btn btn-cliente">Área da Cliente</a>
+
+    <a href="login-admin.html" class="btn btn-admin">Empresa</a>
+</div>
+
+        <div class="footer-info">
+            &copy; 2026 Zanza • Gestão Inteligente
+        </div>
     </div>
+
 </body>
 </html>

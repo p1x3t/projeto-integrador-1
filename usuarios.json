@@ -1,7 +1,9 @@
 [
   {
+    "nome": "Kethily Diniz",
     "email": "kethilydiniz@gmail.com",
-    "senha": "$2b$10$TikJm7tEl1xbcc8GtnlCW.E650fpv81YC2Rn9pvaRgcXNZOEp1ePW",
-    "nome": "Kethily Diniz"
+    "senha": "$2b$10$Q3VhHs/ryS710i1KrZdyJuTcgBCJQxP9WMhAmJEGezWmqkBkAqisC",
+    "tipo": "admin",
+    "whatsapp": ""
   }
 ]

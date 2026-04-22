@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zanza Admin - Gestão</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pantone-pink: #C21E56;
+            --bg-green: #6faf8f;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --dark: #2d3436;
+            --text-main: #1e293b;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-green);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .login-card {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--pantone-pink);
+            margin-bottom: 5px;
+        }
+
+        .badge-admin {
+            display: inline-block;
+            background: var(--dark);
+            color: white;
+            font-size: 10px;
+            padding: 4px 12px;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        /* Reaproveitando a lógica de abas da tela de cliente */
+        .auth-tabs {
+            display: flex;
+            background: #f1f5f9;
+            padding: 5px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            color: #64748b;
+            background: transparent;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--white);
+            color: var(--pantone-pink);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .auth-form { display: none; text-align: left; }
+        .auth-form.active { display: block; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .form-group { text-align: left; margin-bottom: 15px; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-family: inherit;
+            background: #f8fafc;
+            box-sizing: border-box;
+        }
+
+        .btn-admin {
+            width: 100%;
+            padding: 16px;
+            background: var(--pantone-pink);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-admin:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+        .back-link {
+            display: block;
+            margin-top: 25px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="logo">Zanza.</div>
+        <span class="badge-admin">Painel Administrativo</span>
+
+        <div class="auth-tabs">
+            <button class="tab-btn active" onclick="switchTab('login', this)">Entrar</button>
+            <button class="tab-btn" onclick="switchTab('cadastro', this)">Registrar Empresa</button>
+        </div>
+
+        <form id="form-login" class="auth-form active">
+            <div class="form-group">
+                <label>E-mail Corporativo</label>
+                <input type="email" id="login-email" placeholder="admin@zanza.com.br" required>
+            </div>
+            <div class="form-group">
+                <label>Senha de Acesso</label>
+                <input type="password" id="login-password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn-admin">Acessar Painel</button>
+        </form>
+
+        <form id="form-cadastro" class="auth-form">
+            <div class="form-group">
+                <label>Nome do Estúdio/Salão</label>
+                <input type="text" id="reg-nome" placeholder="Zanza Estética" required>
+            </div>
+            <div class="form-group">
+                <label>E-mail de Cadastro</label>
+                <input type="email" id="reg-email" placeholder="contato@empresa.com" required>
+            </div>
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" required>
+            </div>
+            <button type="submit" class="btn-admin">Cadastrar Minha Empresa</button>
+        </form>
+
+        <a href="index.html" class="back-link">← Voltar ao Início</a>
+    </div>
+
+    <script>
+    // Função para trocar as abas
+    function switchTab(tab, btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+        document.getElementById('form-' + tab).classList.add('active');
+    }
+
+    // --- LÓGICA DE LOGIN ---
+    document.getElementById('form-login').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        try {
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                // IMPORTANTE: O server espera 'senha', não 'password'
+                body: JSON.stringify({ email, senha: password, tipo: 'admin' })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                window.location.href = data.redirect; 
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Erro ao conectar.");
+        }
+    });
+
+    // --- LÓGICA DE CADASTRO (O que estava dando erro na imagem) ---
+    document.getElementById('form-cadastro').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nome = document.getElementById('reg-nome').value;
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+
+        try {
+            const response = await fetch('/register', { // Rota correta do seu server
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                // Enviando os campos que o seu server.js espera:
+                body: JSON.stringify({ 
+                    nome: nome, 
+                    email: email, 
+                    senha: password, // O server espera 'senha'
+                    tipo: 'admin' 
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert("Empresa cadastrada com sucesso! Agora faça o login.");
+                location.reload(); 
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            console.error("Erro detalhado:", error);
+            alert("Erro ao conectar.");
+        }
+    });
+</script>
+
+</body>
+</html>
